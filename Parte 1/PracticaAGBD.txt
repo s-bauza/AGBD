@@ -1,0 +1,174 @@
+
+/*Abrrimos el mysql 8.8 client*/ SI NO FUNCIONA
+/* CMD ->C:\Program Files\MySQL\MySQL Server 8.0\bin    ////// TENER EN CUETNTA DE ARCHIVOS DEL PROGRAMA Y EL 'BIN'
+	->mysql -u root -p --local-infile=1
+	
+
+password: root
+
+mysql> use pracabd1
+/*Primero se crean las tablas luego insertamos los datos las claves primarias y las claves foraneas */
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+Database changed
+// Para cargar los datos ejemplo
+set global local_infile=1; // solo una vez
+ LOAD DATA LOCAL
+     infile "C:\\Users\\tigre\\OneDrive\\Escritorio\\Clientes_Vehiculos.csv"
+     into table clientes_vehiculos
+     character set latin1
+     FIELDS TERMINATED BY ';'
+     LINES TERMINATED BY '\n';
+
+/*****************************************************************************/
+1. Creación del usuario de nombre ABDDBA y contraseña “abddba”.
+
+Create User 'ABDDBA' identified by 'abddba'; 
+
+2. Elaboración de los scripts necesarios para:  
+
+	a. Crear la base de datos de nombre PracABD1.
+
+		Create database PracABD1;  
+
+	b. Eliminar la base de datos de nombre PracABD1. 
+
+		Drop database PracABD1;
+
+3. Tamaños, en el pdf
+
+4. Elaboración de los scripts necesarios para:
+
+	A. Crear los Espacios Físicos (datafiles) y lógicos (tablespaces) de la BD.
+
+		create tablespace TBLS_clientes Add DATAFILE 'DF_clientes.ibd' FILE_BLOCK_SIZE = 16384;
+		create tablespace TBLS_vehiculos Add DATAFILE 'DF_vehículos.ibd' FILE_BLOCK_SIZE = 16384;
+		create tablespace TBLS_clientes_vehiculos Add DATAFILE 'DF_cliente_vehiculos.ibd' FILE_BLOCK_SIZE = 16384;
+	
+	B. Eliminar los espacios físicos y lógicos de la BD.
+		
+		drop tablespace TBLS_clientes;
+		drop tablespace TBLS_vehiculos;
+		drop tablespace TBLS_clientes_vehiculos;
+
+5. Elaboración de los Scripts necesarios para:
+
+	A. Crear las tablas de la BD en los espacios lógicos definidos anteriormente.
+
+	create table clientes (ClienteID int unique, DNI varchar(9) unique, Nombre varchar(20), Apellidos varchar(30), 	Género char(1), Dirección varchar(60), Localidad varchar(50), Provincia varchar(30), CodPostal varchar(5), Telefono 	varchar(9), Canal tinyint(1), FechaNacimiento date,FechaContacto date, Email varchar(60)) tablespace TBLS_clientes;
+	
+	create table vehiculos (CocheID int unique, Matricula varchar(8) unique, NumBastidor varchar(16) unique, 	MarcaModelo varchar(32), Color varchar(20), Año smallint) tablespace TBLS_vehiculos;
+
+	create table clientes_vehiculos (ClienteID int, CocheID int, Comprado char(1), Comentarios varchar(500)) tablespace 	TBLS_clientes_vehiculos;
+
+	B. Eliminar las tablas de la BD.
+
+	drop table clientes;	
+	drop table vehiculos;
+	drop table clientes_vehiculos;
+
+
+7. Inserción de los datos en las tablas a partir del juego de datos proporcionado.
+
+	ALTER TABLE vehiculos ADD COLUMN Color VARCHAR(15) AFTER marcamodelo; // no necesario si se metio en la tabla
+	ALTER TABLE vehiculos CHANGE COLUMN `MarcaModelo` `MarcaModelo` VARCHAR(40) NULL DEFAULT NULL ; // lo mismo
+
+8. Elaboración de los siguientes Scripts
+
+	A. Creación de las claves primarias de cada tabla
+	
+		ALTER TABLE clientes ADD CONSTRAINT PRIMARY KEY(ClienteId);
+		ALTER TABLE vehiculos ADD CONSTRAINT PRIMARY KEY(CocheId);
+	
+	B. Creación de las claves foráneas
+
+		ALTER TABLE clientes_vehiculos ADD CONSTRAINT FK_clientes_vehiculos_ClienteID FOREIGN KEY(ClienteID) REFERENCES clientes(ClienteID);
+		ALTER TABLE clientes_vehiculos ADD CONSTRAINT FK_clientes_vehiculos_CocheID FOREIGN KEY(CocheID) REFERENCES vehiculos(CocheID);
+
+	C. Borrado de las claves foráneas de las tablas.
+
+		ALTER TABLE clientes_vehiculos DROP FOREIGN KEY FK_clientes_vehiculos_ClienteID; 
+		ALTER TABLE clientes_vehiculos DROP FOREIGN KEY FK_clientes_vehiculos_CocheID; 
+
+	D. Borrado de las claves primarias de las tablas.
+		
+		alter table clientes drop primary key ;
+		alter table vehiculos drop primary key ;
+
+9. En el pfd tiempos de cargas en consecuencia de asignacion de las claves primarias y secundarias
+
+/*Pregunta 9
+* a. Índices antes de la carga: 6, 8a, 8b, 7 load conection lost con el import wizard
+* b. Índices después de la carga: 6, 7, 8a, 8b el de cleintes_vehiculos 2 horas min apro y clientes y vechiculos un minuto como mucho
+*/
+
+/*Parte 2 consultas*/
+-- 1
+-- a
+select Email from Clientes where Nombre="Ángeles" and Apellidos="del Nido";
+-- b
+select count(ClienteID) from clientes where Provincia="Lugo";
+-- c
+select Nombre,Apellidos,Email from clientes where canal="1" and year(FechaContacto)=2019;
+-- d
+select clientes.nombre, clientes.apellidos, vehiculos.matricula 
+from clientes_vehiculos  
+join clientes on clientes_vehiculos.clienteId = clientes.clienteId  
+    join vehiculos on clientes_vehiculos.cocheId = vehiculos.cocheId
+where clientes_vehiculos.comprado = 1 and clientes.provincia = "Madrid" 
+order by clientes.apellidos ;
+-- e Cuantos coches se compraron en 1 año(Nos permite estudiar los índices sobre el campo año que es un entero).
+Select count(cocheId) from vehiculos where año = 2008 ;
+ 
+ -- 2
+CREATE INDEX idx_nombre ON clientes(nombre); 
+CREATE INDEX idx_apellidos ON clientes(apellidos); 
+CREATE INDEX idx_nombre_apellidos ON clientes(nombre, apellidos); 
+CREATE INDEX idx_apellidos_nombre ON clientes(apellidos,nombre); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

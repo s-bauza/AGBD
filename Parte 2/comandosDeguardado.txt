@@ -1,0 +1,38 @@
+Para hacer el backup
+
+/* CMD ->C:\Program Files\MySQL\MySQL Server 8.0\bin    
+	->mysqldump -u ABDDBA -pabddba pracabd1 > C:\Users\tigre\OneDrive\Escritorio\backup_fecha.sql
+
+
+C:\Program Files\MySQL\MySQL Server 8.0\bin>mysqldump -u ABDDBA -pabddba pracabd1 > C:\Users\tigre\OneDrive\Escritorio\backup_fecha.sql
+
+
+/* powershell   -> cd "C:\Program Files\MySQL\MySQL Server 8.0\bin" 
+		->.\mysqldump -u ABDDBA -pabddba pracabd1 > C:\Users\tigre\OneDrive\Escritorio\backup_fecha.sql
+
+
+/*Abrrimos el mysql 8.8 client*/ SI NO FUNCIONA
+/* CMD ->C:\Program Files\MySQL\MySQL Server 8.0\bin    ////// TENER EN CUETNTA DE ARCHIVOS DEL PROGRAMA Y EL 'BIN'
+	->mysql -u root -p --local-infile=1
+	
+
+password: root
+
+mysql> use pracabd1
+/*Primero se crean las tablas luego insertamos los datos las claves primarias y las claves foraneas */
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+Database changed
+// Para cargar los datos ejemplo
+set global local_infile=1; // solo una vez
+ LOAD DATA LOCAL
+     infile "C:\\Users\\tigre\\OneDrive\\Escritorio\\Clientes_Vehiculos.csv"
+     into table clientes_vehiculos
+     character set latin1
+     FIELDS TERMINATED BY ';'
+     LINES TERMINATED BY '\n';
+
+
+El backup de 70MB es de powershell
+El backup de 35MB es de CMD
